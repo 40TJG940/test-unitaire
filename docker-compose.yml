@@ -51,6 +51,8 @@ services:
     depends_on:
       frontend:
         condition: service_healthy
+      tests:
+        condition: service_completed_successfully
     environment:
       BASE_URL: http://frontend
     profiles:
