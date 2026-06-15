@@ -1,0 +1,5 @@
+node_modules
+coverage
+.git
+TP0
+*.md
