@@ -1,7 +1,7 @@
-# Mini-Projet BDD & Tests Manuels — AliExpress
+# Mini-Projet BDD — AliExpress
 
 > Application e-commerce : **AliExpress**
-> Approche : User Story → Critères d'acceptation → Scénarios BDD (Gherkin) → Test manuel
+> Approche : User Story → Critères d'acceptation → Scénarios BDD (Gherkin)
 
 ---
 
@@ -32,13 +32,6 @@ Scenario: Recherche sans correspondance directe
   And des produits alternatifs sont suggérés (fallback automatique)
 ```
 
-**Test manuel**
-1. Ouvrir fr.aliexpress.com.
-2. Saisir "casque bluetooth" dans la barre de recherche, valider (Entrée).
-3. Vérifier l'URL : doit contenir `wholesale-casque-bluetooth`.
-4. Vérifier au moins 10 produits affichés avec titre, prix, note.
-5. Refaire avec "xyzabc123nonexistant" → vérifier que la page charge et affiche des suggestions alternatives.
-
 **Résultat du test (réel) :** ✓ Validé — recherche "casque bluetooth" : 16 produits pertinents avec titre, prix (9,04€ à 61,39€), note (4.4 à 4.9), nombre de ventes. Requête bidon : 7 produits alternatifs suggérés, pas de message d'erreur.
 
 ---
@@ -63,12 +56,6 @@ Scenario: Affichage des informations produit
   And le bouton "Ajouter au panier" est visible
 ```
 
-**Test manuel**
-1. Lancer une recherche, cliquer sur un produit.
-2. Vérifier la présence : titre, prix, photos, description, avis, infos vendeur, livraison.
-3. Sélectionner une variante (couleur/taille) → vérifier mise à jour du prix/stock.
-4. Vérifier que le bouton "Ajouter au panier" est cliquable.
-
 **Résultat du test (réel) :** ✓ Validé — fiche affiche titre H1 complet, plusieurs prix selon variantes (de 2,85€ à 11,51€), 8 éléments SKU sélectionnables, 95 images, bouton "Ajouter au panier" présent.
 
 ---
@@ -92,12 +79,6 @@ Scenario: Ajout d'un produit disponible au panier
   And le compteur du panier est incrémenté
   And le total est mis à jour
 ```
-
-**Test manuel**
-1. Ouvrir une fiche produit disponible.
-2. Cliquer sur "Ajouter au panier".
-3. Vérifier le compteur du panier (+1) et le message de confirmation.
-4. Ouvrir le panier → vérifier le produit, sa quantité (1) et son prix.
 
 **Résultat du test (réel) :** ✓ Validé — clic sur "Ajouter au panier" → badge passe à "1", lien "Aller au panier" apparaît. Note : pas de popup de confirmation explicite, c'est le badge incrémenté qui sert de feedback.
 
@@ -128,12 +109,6 @@ Scenario: Suppression d'un article
   Then le produit n'apparaît plus dans le panier
   And le total est mis à jour
 ```
-
-**Test manuel**
-1. Ouvrir le panier avec au moins 1 produit.
-2. Augmenter la quantité → vérifier que le sous-total et total se mettent à jour.
-3. Cliquer sur "Supprimer" → vérifier que l'article disparaît et le total recalcule.
-4. Vider le panier → vérifier l'affichage "Votre panier est vide".
 
 **Résultat du test (réel) :** ✓ Validé — augmentation 1→3 : sous-total passe de 8,66€ à 25,98€ (recalcul exact), total articles 11,51€ → 34,53€. Diminution 3→1 : tout repart à 8,66€. Icônes de suppression présentes (corbeille).
 
@@ -167,13 +142,6 @@ Scenario: Code promo invalide
   And le total reste inchangé
 ```
 
-**Test manuel**
-1. Ajouter un produit au panier, cliquer sur "Paiement".
-2. Se connecter (si nécessaire).
-3. Sur la page checkout, repérer le champ "Coupons / codes promo".
-4. Saisir un code valide → vérifier réduction + nouveau total.
-5. Saisir un code invalide → vérifier message d'erreur.
-
 **Résultat du test (réel) :** ⚠ **Non exécutable sans compte connecté**. Le panier AliExpress n'expose **pas** de champ code promo (mention "Éligible coupons" uniquement). Le clic sur "Paiement" redirige vers une demande de connexion. Scénario BDD ajusté en conséquence (saisie du code à l'étape checkout, pas au panier).
 
 ---
@@ -206,13 +174,6 @@ Scenario: Champ obligatoire manquant
   And la commande n'est pas validée
 ```
 
-**Test manuel**
-1. Depuis le panier, cliquer sur "Passer la commande".
-2. Saisir adresse, choisir mode de livraison, mode de paiement.
-3. Vérifier le récapitulatif (produits, total, frais de port).
-4. Tester sans adresse → vérifier le message d'erreur.
-5. Compléter et valider → vérifier la redirection vers confirmation.
-
 **Résultat du test (réel) :** ⚠ **Non exécutable sans compte connecté**. Sur AliExpress, le clic sur "Paiement" depuis le panier déclenche une demande d'authentification obligatoire. Test à reprendre avec un compte de test dédié.
 
 ---
@@ -238,13 +199,6 @@ Scenario: Affichage de la confirmation de commande
   And un email de confirmation est envoyé
   And le panier est vide
 ```
-
-**Test manuel**
-1. Valider une commande complète.
-2. Vérifier la présence d'un numéro de commande sur l'écran final.
-3. Vérifier le récapitulatif (produits, total, adresse).
-4. Vérifier la réception de l'email de confirmation.
-5. Ouvrir le panier → vérifier qu'il est vide.
 
 **Résultat du test (réel) :** ⚠ **Non exécutable sans compte connecté ni paiement réel**. Test à dérouler avec un compte de test et idéalement un environnement sandbox (paiement non débité).
 
