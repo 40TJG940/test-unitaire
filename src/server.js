@@ -1,9 +1,30 @@
 const http = require("http");
 const url = require("url");
+const fs = require("fs");
+const path = require("path");
 const Calculator = require("./calculator");
 
 const PORT = process.env.PORT || 3000;
 const ALLOWED_OPERATIONS = ["add", "subtract", "multiply", "divide"];
+
+const PUBLIC_DIR = path.join(__dirname, "..", "public");
+
+// Assets statiques servis à la racine. Whitelist explicite : tout autre
+// chemin GET reste un 404 JSON (le contrat de l'API ne change pas).
+const STATIC_ROUTES = {
+  "/": { file: "index.html", type: "text/html; charset=utf-8" },
+  "/index.html": { file: "index.html", type: "text/html; charset=utf-8" },
+  "/style.css": { file: "style.css", type: "text/css; charset=utf-8" },
+  "/app.js": { file: "app.js", type: "application/javascript; charset=utf-8" },
+};
+
+// Chargés une fois au démarrage : pas d'I/O ni de branche d'erreur par requête.
+const STATIC_CACHE = Object.fromEntries(
+  Object.entries(STATIC_ROUTES).map(([route, { file, type }]) => [
+    route,
+    { body: fs.readFileSync(path.join(PUBLIC_DIR, file)), type },
+  ])
+);
 
 const CORS_HEADERS = {
   "Content-Type": "application/json; charset=utf-8",
@@ -17,6 +38,14 @@ const calculator = new Calculator();
 function sendJSON(res, statusCode, payload, extraHeaders = {}) {
   res.writeHead(statusCode, { ...CORS_HEADERS, ...extraHeaders });
   res.end(JSON.stringify(payload));
+}
+
+function serveStatic(res, asset) {
+  res.writeHead(200, {
+    "Content-Type": asset.type,
+    "Access-Control-Allow-Origin": "*",
+  });
+  res.end(asset.body);
 }
 
 function requestHandler(req, res) {
@@ -41,7 +70,13 @@ function requestHandler(req, res) {
   const parsed = url.parse(req.url, true);
   const pathname = parsed.pathname;
 
-  // 4. Route ≠ /calculate → 404
+  // 4a. Asset statique whitelisté → sert le front (HTML/CSS/JS)
+  if (STATIC_CACHE[pathname]) {
+    serveStatic(res, STATIC_CACHE[pathname]);
+    return;
+  }
+
+  // 4b. Route ≠ /calculate et hors assets → 404 JSON (contrat API inchangé)
   if (pathname !== "/calculate") {
     sendJSON(res, 404, { error: "Route introuvable." });
     return;

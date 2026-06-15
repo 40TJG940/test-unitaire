@@ -11,6 +11,7 @@ module.exports = [
         exports: "readonly",
         process: "readonly",
         console: "readonly",
+        __dirname: "readonly",
       },
     },
     rules: {
@@ -31,6 +32,20 @@ module.exports = [
         beforeEach: "readonly",
         afterEach: "readonly",
         jest: "readonly",
+      },
+    },
+  },
+  {
+    files: ["public/**/*.js"],
+    languageOptions: {
+      globals: {
+        document: "readonly",
+        window: "readonly",
+        fetch: "readonly",
+        URLSearchParams: "readonly",
+        setInterval: "readonly",
+        console: "readonly",
+        module: "writable",
       },
     },
   },

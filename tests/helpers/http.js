@@ -18,14 +18,23 @@ function request(server, path, method = "GET") {
         res.on("data", (chunk) => {
           data += chunk;
         });
-        res.on("end", () =>
+        res.on("end", () => {
+          // Parse JSON uniquement si la réponse est du JSON ; sinon body brut
+          // (les assets statiques HTML/CSS/JS sont renvoyés en texte).
+          const contentType = res.headers["content-type"] || "";
+          let body = null;
+          if (data) {
+            body = contentType.includes("application/json")
+              ? JSON.parse(data)
+              : data;
+          }
           resolve({
             status: res.statusCode,
             headers: res.headers,
-            body: data ? JSON.parse(data) : null,
+            body,
             duration: Date.now() - start,
-          })
-        );
+          });
+        });
       }
     );
     req.on("error", reject);

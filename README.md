@@ -20,6 +20,11 @@ npm start
 # → Serveur démarré sur http://localhost:3000
 ```
 
+Le serveur sert à la fois l'**API JSON** (`/calculate`) et le **front** : ouvre
+<http://localhost:3000/> pour la calculatrice web (HTML/CSS/JS natif, sans framework,
+dans `public/`). Le front consomme `GET /calculate` et gère les états loading /
+succès / erreur (400, division par zéro, serveur injoignable).
+
 ## Endpoint
 
 ```
@@ -43,8 +48,9 @@ curl "http://localhost:3000/calculate?operation=divide&a=10&b=0"
 | Situation | Code |
 |---|---|
 | Calcul réussi | 200 |
+| Front servi (`/`, `/index.html`, `/style.css`, `/app.js`) | 200 |
 | Paramètre manquant / non numérique / opération inconnue / division par zéro | 400 |
-| Route ≠ `/calculate` | 404 |
+| Route inconnue (≠ `/calculate` et hors assets front) | 404 |
 | Méthode ≠ GET/OPTIONS | 405 + header `Allow: GET, OPTIONS` |
 | Préflight CORS (OPTIONS) | 204 sans body |
 
@@ -63,12 +69,17 @@ curl "http://localhost:3000/calculate?operation=divide&a=10&b=0"
 
 ```
 calculator-api-js/
+├── public/                ← front vanilla servi à la racine
+│   ├── index.html
+│   ├── style.css
+│   └── app.js            ← logique testable (buildCalcUrl, validate, interpret)
 ├── src/
 │   ├── calculator.js     ← logique métier
-│   └── server.js         ← serveur HTTP natif
+│   └── server.js         ← serveur HTTP natif (API + service statique)
 ├── tests/
 │   ├── calculator.test.js
 │   ├── api.test.js
+│   ├── front.test.js     ← tests de la logique front
 │   └── helpers/
 │       └── http.js
 ├── .github/workflows/ci.yml

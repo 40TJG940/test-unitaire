@@ -206,12 +206,6 @@ describe("API /calculate", () => {
       expect(body.error).toBe("Route introuvable.");
     });
 
-    it("racine / → 404 avec error", async () => {
-      const { status, body } = await request(server, "/");
-      expect(status).toBe(404);
-      expect(body).toHaveProperty("error");
-    });
-
     it("slash final /calculate/ → 404 avec error", async () => {
       const { status, body } = await request(server, "/calculate/");
       expect(status).toBe(404);
@@ -240,6 +234,42 @@ describe("API /calculate", () => {
       expect(body.result).toBe(5);
       // JSON.stringify(-0) produit "0" → le client reçoit 0
       expect(body.a).toBe(0);
+    });
+  });
+
+  describe("Front statique servi à la racine", () => {
+    it("racine / → 200 HTML (page calculatrice)", async () => {
+      const { status, headers, body } = await request(server, "/");
+      expect(status).toBe(200);
+      expect(headers["content-type"]).toBe("text/html; charset=utf-8");
+      expect(body).toContain("<!DOCTYPE html>");
+      expect(body).toContain("/app.js");
+    });
+
+    it("/index.html → 200 HTML", async () => {
+      const { status, headers } = await request(server, "/index.html");
+      expect(status).toBe(200);
+      expect(headers["content-type"]).toBe("text/html; charset=utf-8");
+    });
+
+    it("/style.css → 200 CSS", async () => {
+      const { status, headers, body } = await request(server, "/style.css");
+      expect(status).toBe(200);
+      expect(headers["content-type"]).toBe("text/css; charset=utf-8");
+      expect(body).toContain(".calculator");
+    });
+
+    it("/app.js → 200 JavaScript", async () => {
+      const { status, headers, body } = await request(server, "/app.js");
+      expect(status).toBe(200);
+      expect(headers["content-type"]).toBe("application/javascript; charset=utf-8");
+      expect(body).toContain("buildCalcUrl");
+    });
+
+    it("un asset non whitelisté (/secret.js) → 404 JSON (contrat API préservé)", async () => {
+      const { status, body } = await request(server, "/secret.js");
+      expect(status).toBe(404);
+      expect(body.error).toBe("Route introuvable.");
     });
   });
 });

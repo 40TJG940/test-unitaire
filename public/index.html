@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La calculatrice</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <div>
+          <h1>La calculatrice</h1>
+        </div>
+        <div class="clock">
+          <span id="date"></span>
+          <span id="time"></span>
+        </div>
+      </header>
+
+      <section class="calculator">
+        <input
+          id="display"
+          class="display"
+          type="text"
+          value="0"
+          readonly
+          aria-label="Résultat"
+        />
+
+        <div class="keys">
+          <button class="key key--fn" data-action="clear">CE</button>
+          <button class="key key--fn" data-action="back">←</button>
+          <button class="key key--fn" data-action="percent">%</button>
+          <button class="key key--op" data-op="+">+</button>
+
+          <button class="key" data-digit="7">7</button>
+          <button class="key" data-digit="8">8</button>
+          <button class="key" data-digit="9">9</button>
+          <button class="key key--op" data-op="−">−</button>
+
+          <button class="key" data-digit="4">4</button>
+          <button class="key" data-digit="5">5</button>
+          <button class="key" data-digit="6">6</button>
+          <button class="key key--op" data-op="×">×</button>
+
+          <button class="key" data-digit="1">1</button>
+          <button class="key" data-digit="2">2</button>
+          <button class="key" data-digit="3">3</button>
+          <button class="key key--op" data-op="÷">÷</button>
+
+          <button class="key" data-digit="0">0</button>
+          <button class="key" data-action="negate">±</button>
+          <button class="key" data-action="decimal">,</button>
+          <button class="key key--equals" data-action="equals">=</button>
+        </div>
+      </section>
+    </main>
+
+    <button
+      id="history-toggle"
+      class="history-toggle"
+      aria-label="Afficher l'historique"
+      aria-expanded="false"
+    >
+      ☰
+    </button>
+
+    <aside id="history-panel" class="history" aria-hidden="true" aria-label="Historique des calculs">
+      <div class="history__head">
+        <h2>Historique</h2>
+        <div class="history__actions">
+          <button id="history-clear" class="history__btn">Effacer</button>
+          <button id="history-close" class="history__btn history__btn--close" aria-label="Fermer">✕</button>
+        </div>
+      </div>
+      <ul id="history-list" class="history__list"></ul>
+      <p id="history-empty" class="history__empty">Aucun calcul pour l'instant.</p>
+    </aside>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
