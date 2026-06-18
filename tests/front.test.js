@@ -2,6 +2,7 @@ const {
   operationFor,
   buildCalcUrl,
   interpret,
+  resolveDivideByZero,
   appendDigit,
   appendDecimal,
   toggleSign,
@@ -53,6 +54,28 @@ describe("Front — interpret (réponse API → état)", () => {
   });
 });
 
+describe("Front — resolveDivideByZero (override ÷ par 0)", () => {
+  it("1 / 0 → +∞", () => {
+    expect(resolveDivideByZero("1", "÷", "0")).toEqual({ ok: true, value: Infinity });
+  });
+
+  it("-1 / 0 → −∞", () => {
+    expect(resolveDivideByZero("-1", "÷", "0")).toEqual({ ok: true, value: -Infinity });
+  });
+
+  it("0 / 0 → Erreur (indéfini)", () => {
+    expect(resolveDivideByZero("0", "÷", "0")).toEqual({ ok: false, message: "Erreur" });
+  });
+
+  it("autre opération → null (pas d'override)", () => {
+    expect(resolveDivideByZero("1", "+", "0")).toBeNull();
+  });
+
+  it("b ≠ 0 → null (pas d'override)", () => {
+    expect(resolveDivideByZero("1", "÷", "2")).toBeNull();
+  });
+});
+
 describe("Front — saisie", () => {
   it("appendDigit remplace le zéro initial puis concatène", () => {
     expect(appendDigit("0", "7")).toBe("7");
@@ -90,9 +113,14 @@ describe("Front — formatNumber / toDisplay", () => {
     expect(formatNumber(10 / 3)).toBe("3.33333333333");
   });
 
-  it("Infinity / null → 'Erreur'", () => {
+  it("Infinity → '∞', -Infinity → '−∞'", () => {
+    expect(formatNumber(Infinity)).toBe("∞");
+    expect(formatNumber(-Infinity)).toBe("−∞");
+  });
+
+  it("null / NaN → 'Erreur'", () => {
     expect(formatNumber(null)).toBe("Erreur");
-    expect(formatNumber(Infinity)).toBe("Erreur");
+    expect(formatNumber(NaN)).toBe("Erreur");
   });
 
   it("toDisplay affiche le point décimal en virgule (FR)", () => {
