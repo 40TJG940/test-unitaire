@@ -73,7 +73,7 @@ calculator-api-js/
 │   ├── index.html
 │   ├── style.css
 │   └── app.js            ← logique testable (buildCalcUrl, validate, interpret)
-├── src/
+├── Back_js/              ← back-end (API + service statique)
 │   ├── calculator.js     ← logique métier
 │   └── server.js         ← serveur HTTP natif (API + service statique)
 ├── tests/
