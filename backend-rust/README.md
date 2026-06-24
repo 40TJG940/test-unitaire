@@ -33,17 +33,17 @@ Endpoint principal : `GET /calculate?operation=<op>&a=<n>&b=<n>`
 
 Opérations supportées : `add`, `subtract`, `multiply`, `divide`.
 
-| Requête                                       | Code  | Corps                                              |
-| --------------------------------------------- | ----- | -------------------------------------------------- |
-| `GET /calculate?operation=add&a=2&b=3`        | `200` | `{"operation":"add","a":2,"b":3,"result":5}`       |
-| `GET /calculate` (paramètre manquant)         | `400` | `{"error":"Parametres attendus : operation, a, b"}`|
-| `GET /calculate?operation=add&a=x&b=2`        | `400` | `{"error":"Les parametres a et b doivent etre des nombres."}` |
-| `GET /calculate?operation=modulo&a=1&b=2`     | `400` | `{"error":"Operation inconnue. ..."}`              |
-| `GET /calculate?operation=divide&a=1&b=0`     | `400` | `{"error":"Division par zero impossible."}`        |
-| `GET /`                                       | `200` | `OK` (sonde de santé)                              |
-| Route inconnue                                | `404` | `{"error":"Route introuvable."}`                   |
-| Méthode ≠ GET                                 | `405` | `{"error":"Methode non autorisee. Utiliser GET."}` |
-| `OPTIONS *` (préflight CORS)                  | `204` | _(vide)_                                           |
+| Requête                                   | Code  | Corps                                                         |
+| ----------------------------------------- | ----- | ------------------------------------------------------------- |
+| `GET /calculate?operation=add&a=2&b=3`    | `200` | `{"operation":"add","a":2,"b":3,"result":5}`                  |
+| `GET /calculate` (paramètre manquant)     | `400` | `{"error":"Parametres attendus : operation, a, b"}`           |
+| `GET /calculate?operation=add&a=x&b=2`    | `400` | `{"error":"Les parametres a et b doivent etre des nombres."}` |
+| `GET /calculate?operation=modulo&a=1&b=2` | `400` | `{"error":"Operation inconnue. ..."}`                         |
+| `GET /calculate?operation=divide&a=1&b=0` | `400` | `{"error":"Division par zero impossible."}`                   |
+| `GET /`                                   | `200` | `OK` (sonde de santé)                                         |
+| Route inconnue                            | `404` | `{"error":"Route introuvable."}`                              |
+| Méthode ≠ GET                             | `405` | `{"error":"Methode non autorisee. Utiliser GET."}`            |
+| `OPTIONS *` (préflight CORS)              | `204` | _(vide)_                                                      |
 
 En-têtes CORS (`Access-Control-Allow-Origin/Methods/Headers`) ajoutés sur toutes
 les réponses.
@@ -52,11 +52,12 @@ les réponses.
 
 [Rust](https://rustup.rs/) (édition 2021, `cargo` ≥ 1.70).
 
-> ℹ️ Sur cette machine `cargo` est installé dans `~/.cargo/bin` mais absent du
-> `PATH`. L'ajouter à la session :
-> ```powershell
-> $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
-> ```
+ℹ️ Sur cette machine `cargo` est installé dans `~/.cargo/bin` mais absent du
+`PATH`. L'ajouter à la session PowerShell :
+
+```powershell
+$env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
+```
 
 ## Lancer en local
 
