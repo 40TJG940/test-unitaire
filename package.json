@@ -2,10 +2,10 @@
   "name": "calculator-api-js",
   "version": "1.0.0",
   "description": "API REST Calculatrice en Node.js sans framework, avec tests Jest et CI GitHub Actions",
-  "main": "src/server.js",
+  "main": "Back_js/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "lint": "eslint src/ tests/",
+    "start": "node Back_js/server.js",
+    "lint": "eslint Back_js/ tests/",
     "test": "jest",
     "test:unit": "jest tests/calculator.test.js",
     "test:integration": "jest tests/api.test.js",
