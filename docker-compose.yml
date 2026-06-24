@@ -1,0 +1,74 @@
+services:
+  # ── Backend Node.js (port 3000) ──────────────────────────────────────────
+  calculator-js:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.js
+    ports: ["3000:3000"]
+
+  # ── Backend Python / FastAPI (port 3001) ─────────────────────────────────
+  calculator-python:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.python
+    ports: ["3001:3000"]
+
+  # ── Backend Go (port 3002) ───────────────────────────────────────────────
+  calculator-go:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.go
+    ports: ["3002:3000"]
+
+  # ── Backend C (port 3003) ────────────────────────────────────────────────
+  # Contexte = Back_c/ (Dockerfile y référence les sources directement)
+  # Le front est monté en volume lecture seule depuis la racine.
+  calculator-c:
+    build:
+      context: ./Back_c
+      dockerfile: docker/Dockerfile.c
+    environment:
+      PUBLIC_DIR: /public
+    volumes:
+      - ./public:/public:ro
+    ports: ["3003:3000"]
+
+  # ── Backend C# (port 3004) ───────────────────────────────────────────────
+  calculator-csharp:
+    build:
+      context: ./Back_csharp
+      dockerfile: docker/Dockerfile.csharp
+    environment:
+      PUBLIC_DIR: /public
+    volumes:
+      - ./public:/public:ro
+    ports: ["3004:3000"]
+
+  # ── Backend Rust — API seule (pas de port direct) ────────────────────────
+  calculator-rust:
+    build:
+      context: ./back_rust
+      dockerfile: docker/Dockerfile.rust
+
+  # ── Frontend nginx + proxy Rust (port 3005) ──────────────────────────────
+  calculator-rust-front:
+    image: nginx:alpine
+    ports: ["3005:80"]
+    volumes:
+      - ./public:/usr/share/nginx/html:ro
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [calculator-rust]
+
+  # ── Tests E2E Playwright (profil e2e uniquement) ─────────────────────────
+  # Lancer avec : docker compose --profile e2e up --abort-on-container-exit
+  playwright:
+    build:
+      context: .
+      dockerfile: Dockerfile.playwright
+    depends_on:
+      calculator-js:
+        condition: service_healthy
+    environment:
+      - BASE_URL=http://calculator-js:3000
+    profiles:
+      - e2e
