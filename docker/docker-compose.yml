@@ -1,0 +1,60 @@
+# Calculatrice — un service par backend, chacun sert le front + l'API.
+# Lancer :  docker compose -f docker/docker-compose.yml up -d --build
+#
+# js / python / go : Dockerfile contexte racine, front embarqué (COPY public).
+# c / csharp       : Dockerfile contexte de leur dossier (API) + front monté en volume.
+# rust             : API seule -> nginx (rust-front) sert le front et proxie /calculate.
+name: calculatrice
+
+services:
+  js:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.js
+    ports: ["3000:3000"]
+
+  python:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.python
+    ports: ["3001:3000"]
+
+  go:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.go
+    ports: ["3002:3000"]
+
+  c:
+    build:
+      context: ../Back_c
+      dockerfile: ../docker/Dockerfile.c
+    environment:
+      PUBLIC_DIR: /public
+    volumes:
+      - ../public:/public:ro
+    ports: ["3003:3000"]
+
+  csharp:
+    build:
+      context: ../Back_csharp
+      dockerfile: ../docker/Dockerfile.csharp
+    environment:
+      PUBLIC_DIR: /public
+    volumes:
+      - ../public:/public:ro
+    ports: ["3004:3000"]
+
+  rust:
+    build:
+      context: ../back_rust
+      dockerfile: ../docker/Dockerfile.rust
+    # API seule : le front est servi par rust-front (nginx) ci-dessous.
+
+  rust-front:
+    image: nginx:alpine
+    ports: ["3005:80"]
+    volumes:
+      - ../public:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [rust]
