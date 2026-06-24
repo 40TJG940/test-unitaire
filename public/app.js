@@ -29,16 +29,6 @@ function interpret(status, body) {
   return { ok: false, message: (body && body.error) || `Erreur (HTTP ${status})` };
 }
 
-// L'API renvoie 400 pour toute division par zéro (contrat strict).
-// Côté front, on préfère afficher ±∞ comme une vraie calculatrice :
-//   1 / 0  → +∞     -1 / 0 → −∞     0 / 0 → Erreur (indéfini)
-function resolveDivideByZero(prev, symbol, current) {
-  if (symbol !== "÷" || Number(current) !== 0) return null;
-  const p = Number(prev);
-  if (p === 0 || Number.isNaN(p)) return { ok: false, message: "Erreur" };
-  return { ok: true, value: p > 0 ? Infinity : -Infinity };
-}
-
 function appendDigit(entry, digit) {
   return entry === "0" ? digit : entry + digit;
 }
@@ -89,7 +79,6 @@ if (typeof module !== "undefined" && module.exports) {
     operationFor,
     buildCalcUrl,
     interpret,
-    resolveDivideByZero,
     appendDigit,
     appendDecimal,
     toggleSign,
@@ -172,17 +161,10 @@ function initDom() {
     render();
   }
 
-  // Appelle l'API pour calculer `prev (operator) current`.
-  // Si l'API renvoie l'erreur "division par zéro", on tente d'afficher ±∞ côté front.
   async function evaluate(prev, symbol, current) {
     const response = await fetch(buildCalcUrl(operationFor(symbol), prev, current));
     const body = await response.json();
-    const result = interpret(response.status, body);
-    if (!result.ok) {
-      const override = resolveDivideByZero(prev, symbol, current);
-      if (override) return override;
-    }
-    return result;
+    return interpret(response.status, body);
   }
 
   function inputDigit(digit) {

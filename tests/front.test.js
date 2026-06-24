@@ -2,7 +2,6 @@ const {
   operationFor,
   buildCalcUrl,
   interpret,
-  resolveDivideByZero,
   appendDigit,
   appendDecimal,
   toggleSign,
@@ -51,28 +50,6 @@ describe("Front — interpret (réponse API → état)", () => {
   it("statut inattendu sans body → échec + message avec code HTTP", () => {
     expect(interpret(500, null).ok).toBe(false);
     expect(interpret(500, null).message).toMatch(/HTTP 500/);
-  });
-});
-
-describe("Front — resolveDivideByZero (override ÷ par 0)", () => {
-  it("1 / 0 → +∞", () => {
-    expect(resolveDivideByZero("1", "÷", "0")).toEqual({ ok: true, value: Infinity });
-  });
-
-  it("-1 / 0 → −∞", () => {
-    expect(resolveDivideByZero("-1", "÷", "0")).toEqual({ ok: true, value: -Infinity });
-  });
-
-  it("0 / 0 → Erreur (indéfini)", () => {
-    expect(resolveDivideByZero("0", "÷", "0")).toEqual({ ok: false, message: "Erreur" });
-  });
-
-  it("autre opération → null (pas d'override)", () => {
-    expect(resolveDivideByZero("1", "+", "0")).toBeNull();
-  });
-
-  it("b ≠ 0 → null (pas d'override)", () => {
-    expect(resolveDivideByZero("1", "÷", "2")).toBeNull();
   });
 });
 
