@@ -1,6 +1,7 @@
 # ⚠️ Coordination — deux sessions Claude en parallèle
 
-Une **seconde session Claude** travaille en parallèle sur ce dépôt.
+Une **seconde session Claude** travaille en parallèle sur ce dépôt (elle porte
+le backend en **Rust**, dans `backend-rust/`). Périmètres **disjoints**.
 
 ## Périmètre de CETTE session (backend Python)
 - **Objectif** : porter le backend du TP1 (`Back_js/`) vers **Python + FastAPI**,
@@ -8,7 +9,7 @@ Une **seconde session Claude** travaille en parallèle sur ce dépôt.
   headers), afin de remplacer le backend Node.js **sans toucher au front**
   (`public/`).
 - **Écrit UNIQUEMENT dans `Back_Python/`** : `calculator.py`, `server.py`,
-  `requirements.txt`. Aucun autre fichier du dépôt n'est modifié.
+  `requirements.txt`, `Dockerfile`. Aucun autre fichier du dépôt n'est modifié.
 
 ## Ce que cette session NE touche PAS (pour éviter tout conflit)
 - `Back_js/`, `public/`, `tests/`, `.github/`, `Dockerfile*`,

@@ -1,0 +1,13 @@
+[package]
+name = "calculator-backend"
+version = "0.1.0"
+edition = "2021"
+description = "3e backend de la calculatrice — implementation Rust (std uniquement)"
+
+[[bin]]
+name = "calculator-backend"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
