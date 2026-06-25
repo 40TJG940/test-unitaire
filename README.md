@@ -1,39 +1,14 @@
-# calculator-api-js
+# Calculatrice — API multi-langages
 
-API REST Calculatrice en Node.js **sans framework**, avec tests Jest et CI GitHub Actions.
+API REST Calculatrice implémentée en **6 langages**, avec frontend vanilla, tests unitaires et d'intégration, CI GitHub Actions et Docker Compose.
 
-## Prérequis
-
-- Node.js **≥ 22**
-- npm
-
-## Installation
-
-```bash
-npm install
-```
-
-## Lancer le serveur
-
-```bash
-npm start
-# → Serveur démarré sur http://localhost:3000
-```
-
-Le serveur sert à la fois l'**API JSON** (`/calculate`) et le **front** : ouvre
-<http://localhost:3000/> pour la calculatrice web (HTML/CSS/JS natif, sans framework,
-dans `public/`). Le front consomme `GET /calculate` et gère les états loading /
-succès / erreur (400, division par zéro, serveur injoignable).
-
-## Endpoint
+## Contrat API (commun à tous les backends)
 
 ```
 GET /calculate?operation=<op>&a=<nombre>&b=<nombre>
 ```
 
-Opérations supportées : `add`, `subtract`, `multiply`, `divide`.
-
-### Exemples
+Opérations : `add`, `subtract`, `multiply`, `divide`.
 
 ```bash
 curl "http://localhost:3000/calculate?operation=add&a=5&b=3"
@@ -43,56 +18,206 @@ curl "http://localhost:3000/calculate?operation=divide&a=10&b=0"
 # → {"error":"Division par zéro impossible."}
 ```
 
-### Codes de retour
-
 | Situation | Code |
 |---|---|
 | Calcul réussi | 200 |
-| Front servi (`/`, `/index.html`, `/style.css`, `/app.js`) | 200 |
-| Paramètre manquant / non numérique / opération inconnue / division par zéro | 400 |
-| Route inconnue (≠ `/calculate` et hors assets front) | 404 |
-| Méthode ≠ GET/OPTIONS | 405 + header `Allow: GET, OPTIONS` |
-| Préflight CORS (OPTIONS) | 204 sans body |
+| Assets front (`/`, `/index.html`, `/style.css`, `/app.js`) | 200 |
+| Paramètre manquant / non numérique / opération inconnue / ÷ 0 | 400 |
+| Route inconnue | 404 |
+| Méthode ≠ GET/OPTIONS | 405 + `Allow: GET, OPTIONS` |
+| Préflight CORS (OPTIONS) | 204 |
 
-## Scripts npm
+---
 
-| Commande | Rôle |
-|---|---|
-| `npm run lint` | Vérification ESLint |
-| `npm test` | Tous les tests Jest |
-| `npm run test:unit` | Tests unitaires uniquement |
-| `npm run test:integration` | Tests d'intégration uniquement |
-| `npm run test:coverage` | Tests + rapport HTML (seuil ≥ 90%) |
-| `npm run test:ci` | Variante CI (`--ci --coverage`) |
+## Backends
+
+### Node.js (`Back_js/`)
+
+**Prérequis :** Node.js ≥ 22, npm
+
+```bash
+npm install
+npm start          # http://localhost:3000
+```
+
+**Tests :**
+```bash
+npm run test:back          # Jest — unitaires + intégration
+npm run test:front:unit    # Jest — logique front
+npm run test:e2e           # Playwright — E2E (serveur requis)
+npm run test:coverage      # couverture ≥ 90 %
+npm run lint               # ESLint
+```
+
+---
+
+### Go (`Back_go/`)
+
+**Prérequis :** Go ≥ 1.21
+
+```bash
+cd Back_go
+go run .           # http://localhost:3000
+```
+
+**Tests :**
+```bash
+cd Back_go
+go test ./... -v
+```
+
+---
+
+### Python — FastAPI (`Back_Python/`)
+
+**Prérequis :** Python ≥ 3.12
+
+```bash
+cd Back_Python
+pip install -r requirements.txt
+python server.py   # http://localhost:3000
+```
+
+**Tests :**
+```bash
+pip install -r requirements-dev.txt
+pytest test_calculator.py -v
+```
+
+---
+
+### Rust (`back_rust/`)
+
+**Prérequis :** Rust (cargo)
+
+```bash
+cd back_rust
+cargo run --release   # http://localhost:3000
+```
+
+**Tests :**
+```bash
+cargo test --verbose
+```
+
+---
+
+### C (`Back_c/`)
+
+**Prérequis :** GCC, make
+
+```bash
+cd Back_c
+make && ./calculator-backend   # http://localhost:3000
+```
+
+**Tests :**
+```bash
+make test
+```
+
+---
+
+### C# (`Back_csharp/`)
+
+**Prérequis :** .NET SDK 9.0
+
+```bash
+cd Back_csharp
+dotnet run   # http://localhost:3000
+```
+
+**Tests :**
+```bash
+dotnet run -- test
+```
+
+---
+
+## Frontend (`public/`)
+
+Interface web vanilla (HTML/CSS/JS sans framework), servie par chaque backend à la racine `/`.  
+Ouvrir <http://localhost:3000/> après avoir démarré l'un des backends.
+
+---
+
+## Docker Compose
+
+Tous les backends se lancent en parallèle depuis la racine du projet :
+
+```bash
+docker compose up --build
+```
+
+| Service | Backend | Port hôte |
+|---|---|---|
+| `calculator-js` | Node.js | 3000 |
+| `calculator-python` | Python / FastAPI | 3001 |
+| `calculator-go` | Go | 3002 |
+| `calculator-c` | C | 3003 |
+| `calculator-csharp` | C# | 3004 |
+| `calculator-rust-front` | Rust + nginx | 3005 |
+
+**Tests E2E en Docker** (contre le backend JS) :
+```bash
+docker compose --profile e2e up --abort-on-container-exit
+```
+
+Ou via le compose interne :
+```bash
+docker compose -f docker/docker-compose.yml up --build
+```
+
+---
 
 ## Structure du projet
 
 ```
-calculator-api-js/
-├── public/                ← front vanilla servi à la racine
-│   ├── index.html
-│   ├── style.css
-│   └── app.js            ← logique testable (buildCalcUrl, validate, interpret)
-├── Back_js/              ← back-end (API + service statique)
-│   ├── calculator.js     ← logique métier
-│   └── server.js         ← serveur HTTP natif (API + service statique)
+.
+├── public/                    ← front vanilla (HTML/CSS/JS)
+├── Back_js/                   ← backend Node.js
+├── Back_go/                   ← backend Go
+├── Back_Python/               ← backend Python (FastAPI)
+├── back_rust/                 ← backend Rust
+├── Back_c/                    ← backend C
+├── Back_csharp/               ← backend C#
 ├── tests/
-│   ├── calculator.test.js
-│   ├── api.test.js
-│   ├── front.test.js     ← tests de la logique front
-│   └── helpers/
-│       └── http.js
-├── .github/workflows/ci.yml
-├── eslint.config.js
-├── jest.config.js
-└── package.json
+│   ├── calculator.test.js     ← Jest — logique JS
+│   ├── api.test.js            ← Jest — API HTTP JS
+│   ├── front.test.js          ← Jest — logique front
+│   └── e2e/
+│       └── calculator.spec.js ← Playwright E2E
+├── docker/
+│   ├── Dockerfile.js
+│   ├── Dockerfile.go
+│   ├── Dockerfile.python
+│   ├── Dockerfile.rust
+│   ├── Dockerfile.c
+│   ├── Dockerfile.csharp
+│   ├── nginx.conf             ← proxy nginx pour Rust
+│   └── docker-compose.yml     ← compose alternatif
+├── docker-compose.yml         ← compose principal (racine)
+├── Dockerfile.playwright      ← image E2E
+└── .github/workflows/ci.yml
 ```
 
-## CI
+---
 
-À chaque `git push`, GitHub Actions exécute :
-1. **Lint** (ESLint, Node 22)
-2. **Tests** en matrice sur **Node 22** et **Node 24** (parallèle, `fail-fast: false`)
-3. Upload du rapport de couverture en artefact (rétention 30 jours)
+## CI GitHub Actions
+
+À chaque `git push`, le pipeline exécute en parallèle :
+
+| Job | Outil | Dépendance |
+|---|---|---|
+| **Lint** | ESLint | — |
+| **test-backend** | Jest (Node 22 & 24) | lint |
+| **test-frontend-unit** | Jest | lint |
+| **test-go** | `go test` | — |
+| **test-python** | pytest | — |
+| **test-rust** | `cargo test` | — |
+| **test-c** | `make test` (GCC) | — |
+| **test-csharp** | `dotnet run -- test` | — |
+| **e2e** | Playwright (chromium + firefox) | test-backend, test-frontend-unit |
+| **docker** | `docker compose build` (tous les backends) | tous les tests |
 
 Voir [.github/workflows/ci.yml](.github/workflows/ci.yml).
